@@ -1,0 +1,11 @@
+db:
+  image: orchardup/redis
+web:
+  build: .
+  command: gin
+  volumes:
+    - .:/go/src/github.com/zachlatta/lyft-maps
+  ports:
+    - "3000:3000"
+  links:
+    - db
