@@ -1,8 +1,12 @@
 package main
 
-import "github.com/codegangsta/martini"
+import "github.com/go-martini/martini"
 
 func main() {
+	go webserver()
+}
+
+func webserver() {
 	m := martini.Classic()
 
 	m.Use(martini.Static("public"))
