@@ -1,5 +1,7 @@
-db:
+redis:
   image: orchardup/redis
+  ports:
+    - "6379"
 web:
   build: .
   command: gin
@@ -8,4 +10,4 @@ web:
   ports:
     - "3000:3000"
   links:
-    - db
+    - redis
