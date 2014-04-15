@@ -1,5 +1,7 @@
 # lyft-maps
 
+This project is still under development and not yet usable.
+
 ## Getting Started
 
 Prerequisites:
