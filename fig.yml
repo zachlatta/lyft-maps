@@ -4,7 +4,7 @@ redis:
     - "6379"
 web:
   build: .
-  command: gin
+  command: go run server.go
   volumes:
     - .:/go/src/github.com/zachlatta/lyft-maps
   ports:
