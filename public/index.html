@@ -1,0 +1,106 @@
+<!doctype html>
+<link href="css/leaflet.css" rel="stylesheet" />
+<style type="text/css">
+  html, body, #map {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    min-height: 100%;
+    min-width: 100%;
+  }
+</style>
+<div id="map"></div>
+<script src="js/d3.min.js"></script>
+<script src="js/leaflet.js"></script>
+<script>
+  var tiles = "http://{s}.tiles.mapbox.com/v3/jacob2dot0.i0ki61pi/{z}/{x}/{y}.png"
+// jacob2dot0.i0ki61pi
+  var map = L.map('map', {center: [37.8, -96.9], zoom: 4})
+    .addLayer(new L.TileLayer( tiles ));
+
+  var svg = d3.select(map.getPanes().overlayPane).append("svg");
+  var g = svg.append("g").attr("class", "leaflet-zoom-hide");
+
+  function loadData ( pathto ) {
+    d3.json(pathto, function( collection ) {
+      var transform = d3.geo.transform({point: projectPoint});
+      var path = d3.geo.path().projection(transform);
+
+      var feature = g.selectAll("path")
+        .data(collection.features)
+        .enter()
+        .append("path")
+        .style('stroke', 'none')
+        .style('stroke-width', 'none')
+        .style('fill', 'transparent');
+      var _bounds = [];
+
+      setTimeout(function(){
+        targetPath = d3.selectAll('.leaflet-zoom-hide')[0][0];
+        pathNodes = d3.select(targetPath).selectAll('path')[0];
+
+        collection.features.forEach(function(feature, index){
+          var pathNode = pathNodes[index];
+          var pathLength = pathNode.getTotalLength();
+
+          console.log(d3.selectAll('.leaflet-zoom-hide'));
+          var circle = g.append("circle")
+            .attr('r', 2)
+            .attr('fill', 'black')
+            .attr('transform', function(){
+              var p = pathNode.getPointAtLength(0);
+              return "translate(" + [p.x, p.y] + ")";
+            });
+
+    
+          // Animate the circle:
+
+          var duration = 10000;
+          circle.transition()
+            .duration(duration)
+            .ease("linear")
+            .attrTween("transform", function (d, i) {
+            return function (t) {
+              var p = pathNode.getPointAtLength(pathLength*t);
+              return "translate(" + [p.x, p.y] + ")";
+            }
+          });
+        });
+      },0);
+
+      map.on("viewreset", reset);
+      reset();
+
+      function reset() {
+        var bounds = path.bounds(collection);
+        var topLeft = bounds[0];
+        var bottomRight = bounds[1];
+
+        svg.attr("width", bottomRight[0] - topLeft[0])
+          .attr("height", bottomRight[1] - topLeft[1])
+          .style("left", topLeft[0] + "px")
+          .style("top", topLeft[1] + "px");
+
+        g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
+
+        feature.attr("d", path);
+      }
+
+      // Use Leaflet to implement a D3 geometric transformation.
+      function projectPoint(x, y) {
+        var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+        this.stream.point(point.x, point.y);
+      }
+
+      collection.features.forEach( function( feature ) {
+        _bounds = _bounds.concat( feature.geometry.coordinates );
+      });
+
+      map.fitBounds( _bounds.map( function ( arr ){ return arr.slice().reverse(); } ) );
+    });
+  }
+
+  loadData("json/drivers.json.geojson");
+
+
+</script>
