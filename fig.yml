@@ -1,11 +1,13 @@
-db:
+redis:
   image: orchardup/redis
+  ports:
+    - "6379"
 web:
   build: .
-  command: gin
+  command: go run server.go
   volumes:
     - .:/go/src/github.com/zachlatta/lyft-maps
   ports:
     - "3000:3000"
   links:
-    - db
+    - redis
