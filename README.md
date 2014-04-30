@@ -1,4 +1,4 @@
-# lyft-maps
+# lyft-maps ![Analytics](https://ga-beacon.appspot.com/UA-34529482-6/lyft-maps/readme?pixel)
 
 This project is still under development and not yet usable.
 
